@@ -1,10 +1,10 @@
-import csv                              # zum Einlesen der CSV-Datei
-from dataclasses import dataclass       # zum Definieren der RawGame-Dataclass
-from typing import Optional, List       # für die optionale last_update-Variable und List-Typen
+import csv
+from dataclasses import dataclass
+from typing import Optional, List
+from datetime import datetime
 
-# Dataclass zur Repräsentation eines Spiels mit den entsprechenden Attributen
 @dataclass
-class RawGame:
+class Game:
     img: str
     title: str
     console: str
@@ -17,33 +17,73 @@ class RawGame:
     jp_sales: float
     pal_sales: float
     other_sales: float
-    release_date: str
+    release_date: Optional[datetime]
+    year: Optional[int]
     last_update: Optional[str] = None
 
-# Funktion zum Laden der Spieldaten aus einer CSV-Datei und Rückgabe einer Liste von RawGame-Objekten
-def load_raw_games(csv_path: str) -> List[RawGame]:  # csv_path: Pfad zur CSV-Datei, die die Spieldaten enthält
-    games = []                                       # leere Liste, die später mit RawGame-Objekten gefüllt wird
-    with open(csv_path, encoding="utf-8") as f:      # Öffnen der CSV-Datei im Lesemodus mit UTF-8-Kodierung
-        reader = csv.DictReader(f)                   # Erstellen eines DictReader-Objekts, das die CSV-Daten als Wörterbuch liest (Spaltennamen als Schlüssel)
-        for row in reader:                           # Iterieren über jede Zeile in der CSV-Datei, wobei jede Zeile als Wörterbuch (row) dargestellt wird
+def load_raw_games(csv_path: str) -> List[Game]:  
+    """Lädt Spieldaten aus einer CSV-Datei und gibt 
+    eine Liste von Game-Objekten zurück."""
+    games = [] 
 
-            # Konvertieren der relevanten Felder von Strings zu den entsprechenden Datentypen (z.B. float für Verkaufszahlen)
-            # Hilfsfunktion: leere Strings → 0.0
-            def to_float(value: str) -> float:      # Funktion, die einen String-Wert in einen Float konvertiert, wobei leere Strings als 0.0 behandelt werden
-                return float(value) if value.strip() != "" else 0.0  # Überprüfen, ob der String nicht leer ist (nach Entfernen von Leerzeichen), und entsprechend konvertieren oder 0.0 zurückgeben
-            # Konvertieren der relevanten Felder in die entsprechenden Datentypen
-            row["critic_score"] = to_float(row["critic_score"])
-            row["total_sales"] = to_float(row["total_sales"])
-            row["na_sales"] = to_float(row["na_sales"])
-            row["jp_sales"] = to_float(row["jp_sales"])
-            row["pal_sales"] = to_float(row["pal_sales"])
-            row["other_sales"] = to_float(row["other_sales"])
+    def convert_to_float(value: str) -> float:
+        """Konvertiert einen String in einen Float,
+        wobei leere Strings als 0.0 behandelt werden."""
+        return float(value) if value.strip() else 0.0
+                                         
+    def convert_to_date(value: str) -> Optional[datetime]:
+        """Konvertiert ein Datum im Format YYYY-MM-DD in ein datetime-Objekt."""
+        value = value.strip()
+        if not value:
+            return None
+        try:
+            return datetime.strptime(value, "%Y-%m-%d")
+        except ValueError:
+            return None
+    
+    with open(csv_path, encoding="utf-8") as file:
+        reader = csv.DictReader(file) 
+        
+        for row in reader:
+            # Float-Felder sicher konvertieren
+            float_fields = [
+                "critic_score", "total_sales", "na_sales",
+                "jp_sales", "pal_sales", "other_sales"
+            ]
 
-            # Hilfsfunktion: leere Strings → None
-            # last_update: leere Strings → None
-            if row["last_update"].strip() == "":  # Überprüfen, ob das last_update-Feld leer ist (nach Entfernen von Leerzeichen)
-                row["last_update"] = None         # Wenn das Feld leer ist, wird es auf None gesetzt, andernfalls bleibt der ursprüngliche Wert erhalten
-            # Erstellen eines RawGame-Objekts mit den konvertierten Werten und Hinzufügen zur Liste der Spiele
-            games.append(RawGame(**row))
+            for field in float_fields:
+                row[field] = convert_to_float(row.get(field, ""))
+            
+            # release_date konvertieren
+            release_date = convert_to_date(row.get("release_date", ""))
 
-    return games    # Rückgabe der Liste von RawGame-Objekten, die aus der CSV-Datei geladen wurden
+            # Jahr extrahieren
+            year = release_date.year if release_date else None
+
+            # last_update sicher behandeln
+            last_update_raw = row.get("last_update", "")
+            if not last_update_raw or not last_update_raw.strip():
+                last_update = None
+            else:
+                last_update = last_update_raw.strip()
+
+            # Game-Objekt erzeugen
+            games.append(Game(
+                img=row.get("img", ""),
+                title=row.get("title", ""),
+                console=row.get("console", ""),
+                genre=row.get("genre", ""),
+                publisher=row.get("publisher", ""),
+                developer=row.get("developer", ""),
+                critic_score=row["critic_score"],
+                total_sales=row["total_sales"],
+                na_sales=row["na_sales"],
+                jp_sales=row["jp_sales"],
+                pal_sales=row["pal_sales"],
+                other_sales=row["other_sales"],
+                release_date=release_date,
+                year=year,
+                last_update=last_update
+            ))
+
+    return games
