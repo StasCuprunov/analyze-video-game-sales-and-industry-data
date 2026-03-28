@@ -1,7 +1,6 @@
 import csv
 from dataclasses import dataclass
 from typing import Optional, List
-from datetime import datetime
 
 @dataclass
 class Game:
@@ -17,7 +16,7 @@ class Game:
     jp_sales: float
     pal_sales: float
     other_sales: float
-    release_date: Optional[datetime]
+    release_date: Optional[str]
     year: Optional[int]
     last_update: Optional[str] = None
 
@@ -30,21 +29,14 @@ def load_raw_games(csv_path: str) -> List[Game]:
         """Konvertiert einen String in einen Float,
         wobei leere Strings als 0.0 behandelt werden."""
         return float(value) if value.strip() else 0.0
-                                         
-    def convert_to_date(value: str) -> Optional[datetime]:
-        """Konvertiert ein Datum im Format YYYY-MM-DD in ein datetime-Objekt."""
-        value = value.strip()
-        if not value:
-            return None
-        try:
-            return datetime.strptime(value, "%Y-%m-%d")
-        except ValueError:
-            return None
-    
+                                            
     with open(csv_path, encoding="utf-8") as file:
         reader = csv.DictReader(file) 
         
         for row in reader:
+            # Falls CSV ein year-Feld enthält → entfernen, wir setzen es selbst
+            row.pop("year", None)
+
             # Float-Felder sicher konvertieren
             float_fields = [
                 "critic_score", "total_sales", "na_sales",
@@ -54,19 +46,22 @@ def load_raw_games(csv_path: str) -> List[Game]:
             for field in float_fields:
                 row[field] = convert_to_float(row.get(field, ""))
             
-            # release_date konvertieren
-            release_date = convert_to_date(row.get("release_date", ""))
+            # release_date als String holen
+            release_date = row.get("release_date", "").strip()
 
-            # Jahr extrahieren
-            year = release_date.year if release_date else None
+            # Jahr extrahieren (Format dd-mm-yyyy)
+            if release_date:
+                try:
+                    year = int(release_date[-4:])
+                except ValueError:
+                    year = None
+            else:
+                year = None
 
             # last_update sicher behandeln
-            last_update_raw = row.get("last_update", "")
-            if not last_update_raw or not last_update_raw.strip():
-                last_update = None
-            else:
-                last_update = last_update_raw.strip()
-
+            if not row.get("last_update", "").strip():
+                row["last_update"] = None
+                
             # Game-Objekt erzeugen
             games.append(Game(
                 img=row.get("img", ""),
@@ -83,7 +78,7 @@ def load_raw_games(csv_path: str) -> List[Game]:
                 other_sales=row["other_sales"],
                 release_date=release_date,
                 year=year,
-                last_update=last_update
+                last_update=row.get("last_update")
             ))
 
     return games
