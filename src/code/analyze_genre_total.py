@@ -45,5 +45,6 @@ def print_genre_total_as_diagram(list_of_games):
 
     data_frame = pd.DataFrame(data)
 
-    figure = px.pie(data_frame, values=text_number_of_games, names=text_genre)
+    figure = px.pie(data_frame, values=text_number_of_games, names=text_genre,
+                    title="Verteilung der Genre in den Spielen")
     figure.show()
