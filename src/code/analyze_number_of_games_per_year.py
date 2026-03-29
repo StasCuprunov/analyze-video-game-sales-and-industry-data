@@ -39,5 +39,6 @@ def print_number_of_games_per_year_as_diagram(list_of_games):
 
     data_frame = pd.DataFrame(data)
 
-    figure = px.bar(data_frame, x=text_year, y=text_number_of_games, color=text_genre, text_auto=True)
+    figure = px.bar(data_frame, x=text_year, y=text_number_of_games, color=text_genre, text_auto=True,
+                    title="Anzahl der Spiele pro Jahr und pro Genre")
     figure.show()
