@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 from collections import defaultdict
 
-def sales_diagram(games, top_n=50): # erstellt das Diagramm für die top50 spiele
+def sales_diagram(games, top_n=20): # erstellt das Diagramm für die top50 spiele
     sales = defaultdict(lambda: [0, 0, 0, 0])  # [NA, JP, PAL, Other]
     
     for game in games:# geht alle spiele durch und summiert die verkaufszahlen auf
@@ -36,3 +36,6 @@ def sales_diagram(games, top_n=50): # erstellt das Diagramm für die top50 spiel
     fig.update_layout(barmode="stack")# balken sollten gestapelt werden also die regionen damit man einen balken pro spiel hat
 
     fig.show()#visualisier das diagramm
+
+# command zum csv reinladen games = load_raw_games("dateipfad der csv")
+# command zum diagramm generieren sales_diagram(games, top_n=20)
