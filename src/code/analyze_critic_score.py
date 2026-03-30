@@ -3,7 +3,7 @@ from collections import defaultdict
 from utils import create_empty_console_list, get_index_of_console
 
 def print_critic_score_from_top_games_as_diagram(games):
-    consoles = ["PC", "PS3", "PS4", "NS", "XOne"]
+    consoles = ["PC", "PS3", "PS4", "NS", "XOne", "X360"]
     top_number = 20
 
     top_titles = get_top_games_of_all_time(games, top_number)
@@ -18,16 +18,15 @@ def print_critic_score_from_top_games_as_diagram(games):
             if game.title not in game_dictionary.keys():
                 empty_list = create_empty_console_list(length_of_consoles)
                 game_dictionary.update({game.title: empty_list})
-            index = get_index_of_console(consoles, game.console)
             if game.critic_score is not None and game.critic_score > 0.0:
-                game_dictionary[game.title][index] = game.critic_score
+                index = get_index_of_console(consoles, game.console)
+                if index != -1:
+                    game_dictionary[game.title][index] = game.critic_score
 
     data = []
 
     for value in game_dictionary.values():
         data.append(value)
-
-    print(data)
 
     title = "Critic Score der besten " + str(top_number) + " Spiele aller Zeiten pro Konsole"
 
