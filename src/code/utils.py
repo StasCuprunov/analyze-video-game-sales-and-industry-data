@@ -1,10 +1,3 @@
-def get_all_consoles(list_of_games):
-    list_of_consoles = []
-    for game in list_of_games:
-        if game.console not in list_of_consoles:
-            list_of_consoles.append(game.console)
-    return list_of_consoles
-
 def create_empty_console_list(number_of_consoles):
     console_list = []
     for index in range(number_of_consoles):
