@@ -4,6 +4,11 @@ import pandas as pd
 import plotly.express as px
 from get_data_csv import Game
 
+UNKNOWN = "Unknown"
+COL_DEVELOPER = "Developer"
+COL_COUNT = "Anzahl Spiele"
+
+
 def print_developer_total_as_diagram(games: List[Game], top_n: int) -> None:
     """
     Erstellt ein Kuchendiagramm der Developer-Anteile.
@@ -13,23 +18,22 @@ def print_developer_total_as_diagram(games: List[Game], top_n: int) -> None:
     Parameter:
     games: Liste von Game‑Objekten, aus denen die Publisher ausgelesen werden.
     top_n: Anzahl der Developer, die einzeln angezeigt werden. 
-           Alle weiteren werden zu 'Andere' zusammengefasst.
     """
 
     developer_names: List[str] = []
 
     for game in games:
-        developer_name = game.developer.strip() if game.developer else "Unknown"
+        developer_name = game.developer.strip() if game.developer else UNKNOWN
         if not developer_name:
-            developer_name = "Unknown"
+            developer_name = UNKNOWN
         developer_names.append(developer_name)
 
     developer_counts = Counter(developer_names)
 
     # Unknown separat behandeln
-    unknown_count = developer_counts.get("Unknown", 0)
-    if "Unknown" in developer_counts:
-        del developer_counts["Unknown"]
+    unknown_count = developer_counts.get(UNKNOWN, 0)
+    if UNKNOWN in developer_counts:
+        del developer_counts[UNKNOWN]
 
     # Top-n Developer bestimmen
     top_n_developers = dict(developer_counts.most_common(top_n))
@@ -45,7 +49,7 @@ def print_developer_total_as_diagram(games: List[Game], top_n: int) -> None:
     developer_values = []
 
     if unknown_count > 0:
-        developer_labels.append("Unknown")
+        developer_labels.append(UNKNOWN)
         developer_values.append(unknown_count)
 
     for developer, count in top_n_developers.items():
@@ -57,14 +61,14 @@ def print_developer_total_as_diagram(games: List[Game], top_n: int) -> None:
         developer_values.append(other_count)
 
     developer_dataframe = pd.DataFrame({
-        "Developer": developer_labels,
-        "Anzahl Spiele": developer_values
+        COL_DEVELOPER: developer_labels,
+        COL_COUNT: developer_values
     })
 
     developer_figure = px.pie(
         developer_dataframe,
-        values="Anzahl Spiele",
-        names="Developer",
+        values=COL_COUNT,
+        names=COL_DEVELOPER,
         width=1000,
         height=700
     )
