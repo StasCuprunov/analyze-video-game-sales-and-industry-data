@@ -4,6 +4,11 @@ import pandas as pd
 import plotly.express as px
 from get_data_csv import Game
 
+UNKNOWN = "Unknown"  
+COL_PUBLISHER = "Publisher"
+COL_COUNT = "Anzahl Spiele"
+
+
 def print_publisher_total_as_diagram(games: List[Game], top_n: int) -> None:
     """
     Erstellt ein Kuchendiagramm der Publisher-Anteile.
@@ -18,16 +23,16 @@ def print_publisher_total_as_diagram(games: List[Game], top_n: int) -> None:
 
     publisher_names: List[str] = []
     for game in games:
-        publisher_name = game.publisher.strip() if game.publisher else "Unknown"
+        publisher_name = game.publisher.strip() if game.publisher else UNKNOWN
         if not publisher_name:
-            publisher_name = "Unknown"
+            publisher_name = UNKNOWN
         publisher_names.append(publisher_name)
 
     publisher_counts = Counter(publisher_names)
 
-    unknown_count = publisher_counts.get("Unknown", 0)
-    if "Unknown" in publisher_counts:
-        del publisher_counts["Unknown"]
+    unknown_count = publisher_counts.get(UNKNOWN, 0)
+    if UNKNOWN in publisher_counts:
+        del publisher_counts[UNKNOWN]
 
     top_n_publishers = dict(publisher_counts.most_common(top_n))
 
@@ -40,7 +45,7 @@ def print_publisher_total_as_diagram(games: List[Game], top_n: int) -> None:
     publisher_values = []
 
     if unknown_count > 0:
-        publisher_labels.append("Unknown")
+        publisher_labels.append(UNKNOWN)
         publisher_values.append(unknown_count)
 
     for publisher, count in top_n_publishers.items():
@@ -52,14 +57,14 @@ def print_publisher_total_as_diagram(games: List[Game], top_n: int) -> None:
         publisher_values.append(other_count)
 
     publisher_dataframe = pd.DataFrame({
-        "Publisher": publisher_labels,
-        "Anzahl Spiele": publisher_values
+        COL_PUBLISHER: publisher_labels,
+        COL_COUNT: publisher_values
     })
 
     publisher_figure = px.pie(
         publisher_dataframe,
-        values="Anzahl Spiele",
-        names="Publisher",
+        values=COL_COUNT,
+        names=COL_PUBLISHER,
         width=1000,     # größer
         height=700      # größer
     )
