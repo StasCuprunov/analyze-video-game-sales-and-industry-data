@@ -26,7 +26,7 @@ def sales_diagram(games, top_n=20): # erstellt das Diagramm für die top50 spiel
         sales[game.title][INDEX_OTHER] += game.other_sales
 
     # berechnet den gesamtverkauf eines spiels
-    total_sales = {title: sum(region.sales) for title, region.sales in sales.items()}
+    total_sales = {title: sum(region) for title, region in sales.items()}
     top_titles = sorted(total_sales, key=total_sales.get, reverse=True)[:top_n]# wählt die top spiele aus
 
     df = pd.DataFrame({# erstellt das dataframe fürs plotly
@@ -40,9 +40,9 @@ def sales_diagram(games, top_n=20): # erstellt das Diagramm für die top50 spiel
     fig = px.bar(# generiert das balkendiagramm
         df,
         y=COL_GAME,# y-achse sind die spiele
-        x=[COL_NA, COL_JP, COL_PAL, COL_OTHER]#x-achse die regionen
+        x=[COL_NA, COL_JP, COL_PAL, COL_OTHER],#x-achse die regionen
         orientation="h",# horizontale ausrichtung der balken
-        title=f"Top {top_n} Spiele nach Verkaufszahlen (in Mio.)"
+        title=f"Top {top_n} Spiele nach Verkaufszahlen (in Mio.)",
         text_auto=True   # sollte zahlen direkt im balken anzeigen
     )
 
