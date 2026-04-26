@@ -32,3 +32,14 @@ def find_all_genres(list_of_games):
         if game.genre not in list_of_genres:
             list_of_genres.append(game.genre)
     return list_of_genres
+def create_empty_console_list(number_of_consoles):
+    console_list = []
+    for index in range(number_of_consoles):
+        console_list.append(None)
+    return console_list
+
+def get_index_of_console(list_of_consoles, searched_console):
+    for index in range(len(list_of_consoles)):
+        if list_of_consoles[index] == searched_console:
+            return index
+    return -1
