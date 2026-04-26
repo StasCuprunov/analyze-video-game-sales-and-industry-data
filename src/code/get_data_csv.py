@@ -26,9 +26,12 @@ def load_raw_games(csv_path: str) -> List[Game]:
     games = [] 
 
     def convert_to_float(value: str) -> float:
-        """Konvertiert einen String in einen Float,
-        wobei leere Strings als 0.0 behandelt werden."""
-        return float(value) if value.strip() else 0.0
+        """Konvertiert einen String sicher in einen Float.
+        Fängt zusätzlich ValueError und AttributeError ab."""
+        try:
+            return float(value.strip())
+        except (ValueError, AttributeError):
+            return 0.0
                                             
     with open(csv_path, encoding="utf-8") as file:
         reader = csv.DictReader(file) 
