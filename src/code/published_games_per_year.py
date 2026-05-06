@@ -39,8 +39,8 @@ def games_per_year_diagram(games):
 
     # Layout verbessern
     fig.update_layout(
-        xaxis_title="Jahr",
-        yaxis_title="Anzahl Spiele"
+        xaxis_title=COL_YEAR,
+        yaxis_title=COL_COUNT
     )
 
     fig.show()
