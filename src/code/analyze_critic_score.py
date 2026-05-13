@@ -19,6 +19,7 @@ def print_box_plot_for_critic_score(list_of_games):
 
     figure = px.box(data, y=text_critic_score)
     figure.update_layout(title_text="Verteilung der Critic Scores in den Spielen")
+    figure.show()
 
 def print_critic_score_from_top_games_as_diagram(games):
     consoles = ["PC", "PS3", "PS4", "NS", "XOne", "X360"]
