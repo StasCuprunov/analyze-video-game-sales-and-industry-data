@@ -1,6 +1,22 @@
+import plotly.express as px
 import plotly.graph_objects as go
-from collections import defaultdict
 from utils import create_empty_console_list, get_index_of_console
+
+def print_box_plot_for_critic_score(list_of_games):
+    list_of_critic_scores = []
+
+    for game in list_of_games:
+        critic_score = game.critic_score
+        if critic_score is not None and critic_score != 0.0:
+            list_of_critic_scores.append(critic_score)
+
+    text_critic_score = "Critic Score"
+    data = {
+        text_critic_score: list_of_critic_scores
+    }
+
+    figure = px.box(data, y=text_critic_score)
+    figure.update_layout(title_text="Verteilung der Critic Scores in den Spielen")
 
 def print_critic_score_from_top_games_as_diagram(games):
     consoles = ["PC", "PS3", "PS4", "NS", "XOne", "X360"]
@@ -41,16 +57,3 @@ def print_critic_score_from_top_games_as_diagram(games):
         )
     )
     figure.show()
-
-def get_top_games_of_all_time(games, top_number):
-    game_score_dictionary = defaultdict(float)
-    for game in games:
-        if game.critic_score is None or game.critic_score < 1.0:
-            continue
-        if game.title not in game_score_dictionary.keys():
-            game_score_dictionary[game.title] = game.critic_score
-        elif game_score_dictionary[game.title] < game.critic_score:
-            game_score_dictionary[game.title] = game.critic_score
-    top_titles = sorted(game_score_dictionary, key=game_score_dictionary.get, reverse=True)[:top_number]
-
-    return top_titles
