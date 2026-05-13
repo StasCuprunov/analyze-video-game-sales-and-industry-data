@@ -1,7 +1,8 @@
 import plotly.express as px
 import plotly.graph_objects as go
-from utils import create_empty_console_list, get_index_of_console
+from collections import defaultdict
 import pandas as pd
+from utils import create_empty_console_list, get_index_of_console
 
 def print_box_plot_for_critic_score(list_of_games):
     list_of_critic_scores = []
@@ -84,3 +85,16 @@ def print_linear_regression_for_release_year_and_critic_score(list_of_games):
                         trendline="ols",
                         title="Verlauf des Critic Scores in den Jahren")
     figure.show()
+
+    def get_top_games_of_all_time(games, top_number):
+        game_score_dictionary = defaultdict(float)
+        for game in games:
+            if game.critic_score is None or game.critic_score < 1.0:
+                continue
+            if game.title not in game_score_dictionary.keys():
+                game_score_dictionary[game.title] = game.critic_score
+            elif game_score_dictionary[game.title] < game.critic_score:
+                game_score_dictionary[game.title] = game.critic_score
+        top_titles = sorted(game_score_dictionary, key=game_score_dictionary.get, reverse=True)[:top_number]
+
+        return top_titles
