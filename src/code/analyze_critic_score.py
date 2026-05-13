@@ -1,4 +1,6 @@
 import plotly.express as px
+import plotly.graph_objects as go
+from utils import create_empty_console_list, get_index_of_console
 
 def print_box_plot_for_critic_score(list_of_games):
     list_of_critic_scores = []
@@ -15,9 +17,6 @@ def print_box_plot_for_critic_score(list_of_games):
 
     figure = px.box(data, y=text_critic_score)
     figure.update_layout(title_text="Verteilung der Critic Scores in den Spielen")
-import plotly.graph_objects as go
-from collections import defaultdict
-from utils import create_empty_console_list, get_index_of_console
 
 def print_critic_score_from_top_games_as_diagram(games):
     consoles = ["PC", "PS3", "PS4", "NS", "XOne", "X360"]
